@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<title>Function Demo</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+			background-color: #f0f0f0;
+				}
+
+			h3 {
+				color: #333;
+			}
+			.textfield-wrapper {
+            	display: flex;
+            	align-items: center;
+            	margin-bottom: 10px;
+        	}
+			.textfield{
+				flex: 1;
+            	padding: 8px;
+            	margin-right: 5px;
+            	border: 1px solid #ccc;
+            	border-radius: 4px;
+            	box-sizing: border-box;
+			}
+
+			#textFieldContainer {
+				margin: 20px;
+				width: 30px;
+			}
+			.textfield-container {
+            	display: flex;
+            	align-items: center;
+            	margin-bottom: 10px;
+				
+        	}
+
+
+			input[type="text"] {
+				padding: 8px;
+				margin-bottom: 10px;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				box-sizing: border-box;
+			}
+
+			#addButton {
+				padding: 10px 20px;
+				background-color: rgba(22, 81, 245, 0.962);
+				color: white;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+			}
+
+			#addButton:hover {
+				background-color: rgba(22, 81, 245, 0.962);
+			}
+			
+			.deleteButton {
+            	background-color: #f44336;
+            	color: white;
+            	border: none;
+            	border-radius: 4px;
+            	padding: 5px 10px;
+            	cursor: pointer;
+        	}
+
+        	.deleteButton:hover {
+            	background-color: #d32f2f;
+        	}
+	</style>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+	<h3>Greetings</h3>
+		<button id="addButton" onclick="addTextField()">Add</button>
+		<form id="taskForm" action="/tasks" method="post">
+			<div id="textFieldContainer"></div>
+			<button id="saveButton" type="submit">Save</button>
+		</form>
+		<ol>
+		<% tasks.forEach(item => { %>
+            <li>
+                
+                <form id="updateForm" action="/delete/<%= item._id %>" method="POST">
+                    <input type="text" value="<%= item.Title %>" name='taskNames[]' readonly required>
+					<button type="submit">Delete</button>
+                </form>
+                
+                <form action="/complete/<%= item._id %>" method="POST">
+                    <button class='completeButton' ><% if (item.Completed) { %>
+						Completed
+					  <% } else { %>
+						Complete
+					  <% } %></button>
+                </form>
+            </li>
+            <% }); %>
+        </ol>
+
+
+		
+	<script>
+		function addTextField(){
+			console.log('checking input');
+			const textField = document.createElement('input');
+			textField.setAttribute('type','text');
+			textField.setAttribute('name', 'taskNames[]');
+			textField.setAttribute('placeholder','enter task');
+			//const taskId = generateUniqueIds().toString(); // Generate a unique task ID
+    		//textField.setAttribute('data-taskId', taskId);
+			textField.classList.add('textfield');
+			document.getElementById('textFieldContainer').appendChild(textField);
+			// Function to generate a unique ID
+
+
+			const completeButton = document.createElement('button');
+            completeButton.textContent = 'Complete';
+            completeButton.classList.add('completeButton');
+            completeButton.onclick = function() {
+                textField.classList.add('completed');
+				completeButton.textContent = 'Completed';		
+
+
+            };
+
+			const deleteButton = document.createElement('i');
+    		deleteButton.classList.add('fas', 'fa-trash', 'deleteIcon');
+    		deleteButton.onclick = function() {
+        	textField.remove();
+			completeButton.remove();
+        	deleteButton.remove();
+		}
+		const wrapper = document.createElement('div');
+		wrapper.classList.add('textfield-wrapper');
+		wrapper.appendChild(textField);
+		wrapper.appendChild(completeButton);
+		wrapper.appendChild(deleteButton);
+		document.getElementById('textFieldContainer').appendChild(wrapper);
+		tasks.push(textField.value);
+	}
+	const tasks = [];
+	document.getElementById('taskForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Reset tasks array
+            tasks.length = 0;
+
+            // Get all input fields with name 'taskNames[]'
+            const inputFields = document.querySelectorAll('input[name="taskNames[]"]');
+
+            // Push the value of each input field to tasks array
+            inputFields.forEach(function(inputField) {
+                tasks.push(inputField.value);
+            });
+
+            // Log tasks array to console (for testing)
+            //console.log(tasks);
+
+            // Submit the form
+            this.submit();
+        });
+		
+	</script>
+
+</body> 
+</html>
